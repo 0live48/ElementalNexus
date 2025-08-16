@@ -1,0 +1,161 @@
+/* --- Global Settings & Palette --- */
+:root {
+    --text-light: #f8f9fa;
+    --accent-blue: #48cae4;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #000000; /* Solid black background */
+    font-family: 'Lora', serif;
+    color: var(--text-light);
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* --- Styles for the particles.js container --- */
+#background {
+    position: fixed;
+    display: block;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+}
+
+/* --- Main content wrapper --- */
+main {
+    padding-top: 70px;
+    position: relative;
+    z-index: 10;
+}
+
+/* --- Navigation Bar --- */
+nav {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    padding: 0 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(3, 7, 30, 0.5);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(72, 78, 82, 0.2);
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+nav .logo {
+    font-family: 'UnifrakturCook', cursive;
+    font-size: 2.2rem;
+    color: var(--accent-blue);
+    text-decoration: none;
+}
+
+nav .nav-links a {
+    font-family: 'Lora', serif;
+    color: var(--text-light);
+    text-decoration: none;
+    margin-left: 25px;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+nav .nav-links a:hover {
+    color: var(--accent-blue);
+}
+
+nav .buy-now-btn {
+    background-color: var(--accent-blue);
+    color: #03071e;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+nav .buy-now-btn:hover {
+    background-color: #fff;
+    color: #03071e;
+}
+
+.main-header, .content-section, footer {
+    font-family: 'UnifrakturCook', cursive;
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+h2 {
+    color: var(--accent-blue);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 8px rgba(72, 202, 228, 0.3);
+}
+
+p {
+    font-family: 'Lora', serif;
+    line-height: 1.6;
+    font-size: 1rem;
+    /* ADDED: Text shadow for readability against transparent background */
+    text-shadow: 0 0 5px #000;
+}
+
+.email-link {
+    display: block;
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--accent-blue);
+    margin-top: 1rem;
+}
+
+/* --- Gallery --- */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.gallery-item {
+    /* CHANGED: Made background more transparent */
+    background-color: rgba(3, 7, 30, 0.3);
+    border: 1px solid rgba(72, 78, 82, 0.4);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.gallery-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.gallery-item .caption {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* --- Footer --- */
+footer {
+    font-family: 'Lora', serif;
+    text-align: center;
+    padding-top: 1.5rem;
+    margin-bottom: 0;
+    border-top: 1px solid rgba(72, 78, 82, 0.2);
+    color: #6c757d;
+    font-size: 0.9rem;
+    /* CHANGED: Removed background from footer text area */
+    background: transparent;
+}

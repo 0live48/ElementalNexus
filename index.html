@@ -3,19 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elemental Nexus - The Chetri King Game</title>
-    <link rel="stylesheet" href="elementalnexusstyles.css"> 
+    <title>Elemental Nexus - Particle Galaxy</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body id="home">
 
-    <div class="orb-container">
-        <div class="orb"></div><div class="orb"></div><div class="orb"></div>
-        <div class="orb"></div><div class="orb"></div><div class="orb"></div>
-    </div>
-    <div class="stars-bg"></div>
+    <div id="background"></div>
 
     <nav>
         <a href="#home" class="logo">Elemental Nexus</a>
@@ -23,7 +19,7 @@
             <a href="#home">Home</a>
             <a href="#about">About Us</a>
             <a href="#contact">Contact</a>
-            <a href="#gallery" class="buy-now-btn">Buy Now</a>
+            <a href="#gallery" class="buy-now-btn">Explore</a>
         </div>
     </nav>
 
@@ -31,37 +27,77 @@
         <div class="container">
             <header class="main-header" id="about">
                 <h2>Bio</h2>
-                <p class="company-bio">We are The Elemental Game Company</p>
+                <p class="company-bio">We are The Elemental Game Company, charting new galaxies of gaming.</p>
             </header>
 
             <section id="lore" class="content-section">
-                <h2>Game Info: The Lore of the Chetri King</h2>
-                <p>In an age long forgotten...</p>
-                <p>But a great cataclysm shattered the Nexus...</p>
-                <p>As a Traveler of the cosmic weave...</p>
+                <h2>Cosmic Lore</h2>
+                <p>From the swirling dust and starlight, the Elemental Nexus emerged...</p>
+                <p>Galaxies collided, birthing the elemental forces we now command...</p>
+                <p>Embark on an interstellar journey to master these cosmic energies...</p>
             </section>
 
             <section id="gallery" class="content-section">
-                <h2>Gallery: The World in Your Hands</h2>
+                <h2>Stellar Phenomena</h2>
                 <div class="gallery-grid">
-                    <div class="gallery-item"><img src="https://placehold.co/300x420/111f28/e3cdb3?text=Card" alt="Game card"><p class="caption">The 'Fire Drake' Card</p></div>
-                    <div class="gallery-item"><img src="https://placehold.co/300x420/111f28/e3cdb3?text=Card" alt="Game card"><p class="caption">The 'Water Serpent' Card</p></div>
-                    <div class="gallery-item"><img src="https://placehold.co/400x300/111f28/e3cdb3?text=Gameplay" alt="Gameplay"><p class="caption">A duel in progress</p></div>
-                    <div class="gallery-item"><img src="https://placehold.co/300x420/111f28/e3cdb3?text=Card" alt="Game card"><p class="caption">The 'Earth Golem' Card</p></div>
+                    <div class="gallery-item"><img src="https://placehold.co/300x420/0e1a29/b8c0c8?text=Nebula+Card" alt="Nebula Card"><p class="caption">Card of the Nebula</p></div>
+                    <div class="gallery-item"><img src="https://placehold.co/300x420/0e1a29/b8c0c8?text=Comet+Card" alt="Comet Card"><p class="caption">The Comet's Fury</p></div>
+                    <div class="gallery-item"><img src="https://placehold.co/400x300/0e1a29/b8c0c8?text=Galactic+Duel" alt="Galactic Duel"><p class="caption">A duel amidst the stars</p></div>
+                    <div class="gallery-item"><img src="https://placehold.co/300x420/0e1a29/b8c0c8?text=Planet+Card" alt="Planet Card"><p class="caption">The Planet's Core</p></div>
                 </div>
             </section>
 
             <section id="contact" class="content-section">
-                <h2>Contact Us</h2>
-                <p>For inquiries, partnerships, or questions about the game, please reach out to us.</p>
+                <h2>Reach the Cosmos</h2>
+                <p>Send your interstellar signals to us for any inquiries.</p>
                 <p class="email-link">contact@elementalgameco.com</p>
             </section>
-            
+
             <footer>
-                <p>&copy; 2025 The Elemental Game Company. All Rights Reserved.</p>
+                <p>&copy; 2025 The Elemental Game Company. All Rights Across the Universe Reserved.</p>
             </footer>
         </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+    <script>
+        const config = {
+            "particles": {
+                "number": {
+                    "value": 400,
+                    "density": { "enable": true, "value_area": 800 }
+                },
+                "color": { "value": ["#FFFFFF", "#c78f6c", "#5a5261", "#597ca4", "#f9c1aa", "#514c82"] },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": false },
+                "move": {
+                    "enable": true,
+                    "speed": 1,
+                    "direction": "none",
+                    "random": true,
+                    "straight": false,
+                    "out_mode": "out"
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": { "enable": true, "mode": "repulse" },
+                    "onclick": { "enable": false, "mode": "push" },
+                    "resize": true
+                },
+                "modes": {
+                    "repulse": { "distance": 100, "duration": 0.4 }
+                }
+            },
+            "retina_detect": true
+        };
+        window.onload = function() {
+            particlesJS("background", config);
+        };
+    </script>
 </body>
 </html>
