@@ -1,144 +1,144 @@
-type ElementName =
-  | "Rock"
-  | "Paper"
-  | "Scissors"
-  | "Fire"
-  | "Water"
-  | "Earth"
-  | "Magic"
-  | "Lightning"
-  | "Darkness"
-  | "Plasma";
-
-class Card {
-  element: ElementName;
-  value: number;
-  constructor(element: ElementName, value: number) {
-    this.element = element;
-    this.value = value;
-  }
-}
-
-class Player {
-  hand: Card[] = [];
-  constructor(public name: string) {}
+interface Card {
+    element: string;
+    value: number;
+    elementIndex: number;
 }
 
 class Game {
-  elements: ElementName[] = [
-    "Rock",
-    "Paper",
-    "Scissors",
-    "Fire",
-    "Water",
-    "Earth",
-    "Magic",
-    "Lightning",
-    "Darkness",
-    "Plasma",
-  ];
-  player: Player;
-  opponent: Player;
-  maxHandSize = 7;
+    private playerHand: Card[] = [];
+    private opponentHand: Card[] = [];
+    private elements: string[] = ["Rock", "Paper", "Scissors", "Fire", "Water", "Earth", "Magic", "Lightning", "Darkness", "Plasma"];
+    
+    private playerHandDiv: HTMLElement;
+    private opponentHandDiv: HTMLElement;
+    private resultDiv: HTMLElement;
 
-  constructor() {
-    this.player = new Player("Player");
-    this.opponent = new Player("Opponent");
-    this.startGame();
-  }
+    constructor() {
+        const playerDiv = document.getElementById("player-hand");
+        const opponentDiv = document.getElementById("opponent-hand");
+        const resultDiv = document.getElementById("result");
 
-  startGame() {
-    this.player.hand = this.generateHand();
-    this.opponent.hand = this.generateHand();
-    this.renderHands();
-  }
+        if (!playerDiv || !opponentDiv || !resultDiv) {
+            throw new Error("One or more required HTML elements are missing!");
+        }
 
-  generateHand(): Card[] {
-    const hand: Card[] = [];
-    for (let i = 0; i < this.maxHandSize; i++) {
-      const value = Math.floor(Math.random() * 60) + 1;
-      const elementIndex = Math.floor((value - 1) / 6);
-      const element = this.elements[elementIndex] || "Plasma";
-      hand.push(new Card(element, value));
-    }
-    return hand;
-  }
+        this.playerHandDiv = playerDiv;
+        this.opponentHandDiv = opponentDiv;
+        this.resultDiv = resultDiv;
 
-  renderHands() {
-    const playerDiv = document.getElementById("player-hand")!;
-    playerDiv.innerHTML = "";
-    this.player.hand.forEach((card, index) => {
-      const btn = document.createElement("button");
-      btn.className = "button";
-      btn.innerText = card.element;
-      btn.onclick = () => this.playCard(index);
-      playerDiv.appendChild(btn);
-    });
-
-    const oppDiv = document.getElementById("opponent-hand")!;
-    oppDiv.innerHTML = `Opponent has ${this.opponent.hand.length} cards`;
-  }
-
-  playCard(playerIndex: number) {
-    if (this.player.hand.length === 0 || this.opponent.hand.length === 0) return;
-
-    const playerCard = this.player.hand[playerIndex];
-    const opponentIndex = Math.floor(Math.random() * this.opponent.hand.length);
-    const opponentCard = this.opponent.hand[opponentIndex];
-
-    const result = this.resolveClash(playerCard.element, opponentCard.element);
-    const resultDiv = document.getElementById("result")!;
-    resultDiv.innerText = `You played ${playerCard.element}. Opponent played ${opponentCard.element}. ${result}`;
-
-    // Handle drawing
-    if (result.includes("Player Wins")) {
-      if (this.player.hand.length < this.maxHandSize) this.player.hand.push(this.drawCard());
-    } else if (result.includes("Tie")) {
-      if (this.player.hand.length < this.maxHandSize) this.player.hand.push(this.drawCard());
-      if (this.opponent.hand.length < this.maxHandSize) this.opponent.hand.push(this.drawCard());
-    } else {
-      if (this.opponent.hand.length < this.maxHandSize) this.opponent.hand.push(this.drawCard());
+        this.initHands();
+        this.renderHands();
     }
 
-    this.player.hand.splice(playerIndex, 1);
-    this.opponent.hand.splice(opponentIndex, 1);
-
-    if (this.player.hand.length === 0 || this.opponent.hand.length === 0) {
-      resultDiv.innerText += "\nGame Over!";
+    private initHands(): void {
+        for (let i = 0; i < 7; i++) {
+            this.playerHand.push(this.createRandomCard());
+            this.opponentHand.push(this.createRandomCard());
+        }
     }
 
-    this.renderHands();
-  }
+    private createRandomCard(): Card {
+        const elementIndex = Math.floor(Math.random() * this.elements.length);
+        return {
+            element: this.elements[elementIndex],
+            value: elementIndex + 1,
+            elementIndex
+        };
+    }
 
-  drawCard(): Card {
-    const value = Math.floor(Math.random() * 60) + 1;
-    const elementIndex = Math.floor((value - 1) / 6);
-    const element = this.elements[elementIndex] || "Plasma";
-    return new Card(element, value);
-  }
+    private renderHands(): void {
+        this.playerHandDiv.innerHTML = "";
+        this.opponentHandDiv.innerHTML = "";
 
-  resolveClash(player: ElementName, opponent: ElementName): string {
-    if (player === "Plasma" && opponent === "Plasma") return "Tie!";
-    if (player === "Plasma") return "Player Wins!";
-    if (opponent === "Plasma") return "Player Loses!";
-    if (player === opponent) return "Tie!";
+        this.playerHand.forEach((card, index) => {
+            const cardDiv = document.createElement("div");
+            cardDiv.className = "card player-card";
+            cardDiv.innerText = card.element;
+            cardDiv.onclick = () => this.playTurn(index);
+            this.playerHandDiv.appendChild(cardDiv);
+        });
 
-    const rules: Record<ElementName, ElementName[]> = {
-      Rock: ["Scissors", "Darkness", "Water"],
-      Paper: ["Rock", "Darkness", "Magic"],
-      Scissors: ["Paper", "Magic", "Lightning"],
-      Fire: ["Rock", "Paper", "Earth"],
-      Water: ["Paper", "Scissors", "Darkness", "Lightning", "Fire"],
-      Earth: ["Rock", "Paper", "Water"],
-      Magic: ["Darkness", "Earth", "Fire"],
-      Lightning: ["Magic", "Fire", "Water"],
-      Darkness: ["Scissors", "Lightning", "Earth"],
-      Plasma: [],
-    };
+        this.opponentHand.forEach(() => {
+            const cardDiv = document.createElement("div");
+            cardDiv.className = "card opponent-card";
+            cardDiv.innerText = "X"; // Hidden opponent card
+            this.opponentHandDiv.appendChild(cardDiv);
+        });
+    }
 
-    return rules[player].includes(opponent) ? "Player Wins!" : "Player Loses!";
-  }
+    private playTurn(playerIndex: number): void {
+        if (this.playerHand.length === 0 || this.opponentHand.length === 0) return;
+
+        const playerCard = this.playerHand[playerIndex];
+        const opponentIndex = Math.floor(Math.random() * this.opponentHand.length);
+        const opponentCard = this.opponentHand[opponentIndex];
+
+        const result = this.resolveBattle(playerCard, opponentCard);
+        this.resultDiv.innerText = `Player: ${playerCard.element} vs Opponent: ${opponentCard.element} → ${result}`;
+
+        // Draw logic
+        if (result.includes("Player Wins")) {
+            this.playerHand.push(this.createRandomCard());
+        } else if (result.includes("Player Loses")) {
+            this.opponentHand.push(this.createRandomCard());
+        } else { // Tie
+            this.playerHand.push(this.createRandomCard());
+            this.opponentHand.push(this.createRandomCard());
+        }
+
+        // Remove played cards
+        this.playerHand.splice(playerIndex, 1);
+        this.opponentHand.splice(opponentIndex, 1);
+
+        this.renderHands();
+
+        // Check for game over
+        if (this.playerHand.length === 0 || this.opponentHand.length === 0) {
+            this.resultDiv.innerText += " | Game Over!";
+        }
+    }
+
+    private resolveBattle(playerCard: Card, opponentCard: Card): string {
+        const p = playerCard.element;
+        const o = opponentCard.element;
+
+        if (p === o) return "Tie!";
+        if (p === "Plasma") return "Player Wins!";
+        if (o === "Plasma") return "Player Loses!";
+
+        switch (p) {
+            case "Rock":
+                if (["Scissors", "Darkness", "Water"].includes(o)) return "Player Wins!";
+                return "Player Loses!";
+            case "Paper":
+                if (["Rock", "Darkness", "Magic"].includes(o)) return "Player Wins!";
+                return "Player Loses!";
+            case "Scissors":
+                if (["Paper", "Magic", "Lightning"].includes(o)) return "Player Wins!";
+                return "Player Loses!";
+            case "Darkness":
+                if (["Scissors", "Lightning", "Earth"].includes(o)) return "Player Wins!";
+                return "Player Loses!";
+            case "Magic":
+                if (["Darkness", "Earth", "Fire"].includes(o)) return "Player Wins!";
+                return "Player Loses!";
+            case "Lightning":
+                if (["Magic", "Fire", "Water"].includes(o)) return "Player Wins!";
+                return "Player Loses!";
+            case "Earth":
+                if (["Rock", "Paper", "Water"].includes(o)) return "Player Wins!";
+                return "Player Loses!";
+            case "Fire":
+                if (["Rock", "Paper", "Earth"].includes(o)) return "Player Wins!";
+                return "Player Loses!";
+            case "Water":
+                if (["Paper", "Scissors", "Darkness", "Lightning", "Fire"].includes(o)) return "Player Wins!";
+                return "Player Loses!";
+        }
+
+        return "Tie!";
+    }
 }
 
 // Initialize game
-window.onload = () => new Game();
+const game = new Game();
