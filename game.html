@@ -3,9 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elemental Nexus Game</title>
-<link rel="stylesheet" href="styles.css">
+<title>Elemental Nexus Multiplayer</title>
 <style>
+  /* Base Style - You can move this to styles.css */
+  body { 
+    background-color: #222; 
+    color: #eee; 
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
   #game-area {
     display: flex;
     flex-direction: column;
@@ -20,82 +28,96 @@
     flex-wrap: wrap;
     justify-content: center;
   }
-
+  
+  /* Applying user's saved card size */
   .card {
-    width: 80px;
-    height: 120px;
+    /* Set dimensions based on user's saved info: 2.5 inch x 3.5 inch */
+    width: 2.5in;
+    height: 3.5in; 
     border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 1.2rem;
     cursor: pointer;
-    border: 2px solid #fff;
+    border: 3px solid #6c757d;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    transition: all 0.2s ease-in-out;
+    text-align: center;
+    padding: 5px;
   }
 
   .player-card {
     background-color: #333;
     color: #fff;
-    transition: transform 0.2s;
+    /* transition is set in .card */
   }
 
   .player-card:hover {
-    transform: scale(1.1);
+    transform: scale(1.05) translateY(-5px);
     background-color: #555;
+    border-color: #4CAF50; /* Green highlight on hover */
+  }
+  
+  /* When the player has played, slightly dim the cards and change cursor */
+  .player-card[style*="opacity: 0.5"] {
+      cursor: default !important;
+      transform: none !important;
   }
 
   .opponent-card {
-    background-color: #000;
-    color: #000; /* hide text */
+    background-color: #4a4e69;
+    color: #eee; 
   }
 
   #result {
     margin: 10px 0;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-weight: bold;
-    padding: 10px 20px;
-    border: 2px solid #fff;
-    border-radius: 10px;
+    padding: 15px 30px;
+    border: 3px solid #ffc107;
+    border-radius: 15px;
     text-align: center;
-    min-width: 250px;
+    min-width: 300px;
+    background-color: #333;
   }
 
   #play-again {
-    background-color: #424549;
+    background-color: #dc3545;
     color: #fff;
-    padding: 10px 20px;
+    padding: 12px 25px;
     font-weight: bold;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    margin-top: 10px;
+    margin-top: 20px;
+    font-size: 1rem;
+    transition: background-color 0.2s;
   }
 
   #play-again:hover {
-    background-color: #0056b3;
+    background-color: #c82333;
   }
 </style>
 </head>
 <body>
   <header>
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-    </nav>
+    <h1 style="text-align: center;">Elemental Nexus Multiplayer</h1>
   </header>
 
   <main>
     <div id="game-area">
       <div id="opponent-hand"></div>
-      <div id="result">Make your move!</div>
+      
+      <div id="result">Connecting to server...</div>
+      
       <div id="player-hand"></div>
-      <button id="play-again" onclick="window.location.reload()">Play Again</button>
+      <button id="play-again" onclick="window.location.reload()">Find New Opponent</button>
     </div>
   </main>
 
+  <script src="/socket.io/socket.io.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

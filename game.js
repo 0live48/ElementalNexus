@@ -1,125 +1,138 @@
-class Game {
-  constructor() {
-    this.playerHand = [];
-    this.opponentHand = [];
-    this.elements = ["Rock", "Paper", "Scissors", "Fire", "Water", "Earth", "Magic", "Lightning", "Darkness", "Plasma"];
-    this.playerHandDiv = document.getElementById("player-hand");
-    this.opponentHandDiv = document.getElementById("opponent-hand");
-    this.resultDiv = document.getElementById("result");
+// game.js
+const socket = io(); // Connects to the server running on the same host/port
 
-    this.initHands();
-    this.renderHands();
-  }
+class MultiplayerGame {
+    constructor() {
+        this.socket = socket;
+        this.gameId = null;
+        this.playerHand = [];
+        this.isPlayerTurn = false;
+        this.hasPlayed = false;
 
-  initHands() {
-    for (let i = 0; i < 7; i++) {
-      this.playerHand.push(this.createRandomCard());
-      this.opponentHand.push(this.createRandomCard());
-    }
-  }
+        this.playerHandDiv = document.getElementById("player-hand");
+        this.opponentHandDiv = document.getElementById("opponent-hand");
+        this.resultDiv = document.getElementById("result");
 
-  createRandomCard() {
-    const elementIndex = Math.floor(Math.random() * this.elements.length);
-    return {
-      element: this.elements[elementIndex],
-      value: elementIndex + 1,
-      elementIndex: elementIndex
-    };
-  }
-
-  renderHands() {
-    this.playerHandDiv.innerHTML = "";
-    this.opponentHandDiv.innerHTML = "";
-
-    this.playerHand.forEach((card, index) => {
-      const cardDiv = document.createElement("div");
-      cardDiv.className = "card player-card";
-      cardDiv.innerText = card.element;
-      cardDiv.onclick = () => this.playTurn(index);
-      this.playerHandDiv.appendChild(cardDiv);
-    });
-
-    this.opponentHand.forEach(() => {
-      const cardDiv = document.createElement("div");
-      cardDiv.className = "card opponent-card";
-      cardDiv.innerText = "X";
-      this.opponentHandDiv.appendChild(cardDiv);
-    });
-  }
-
-  playTurn(playerIndex) {
-    if (this.playerHand.length === 0 || this.opponentHand.length === 0) return;
-
-    const playerCard = this.playerHand[playerIndex];
-    const opponentIndex = Math.floor(Math.random() * this.opponentHand.length);
-    const opponentCard = this.opponentHand[opponentIndex];
-
-    const result = this.resolveBattle(playerCard, opponentCard);
-    this.resultDiv.innerText = `Player: ${playerCard.element} vs Opponent: ${opponentCard.element} → ${result}`;
-
-    // Draw logic
-    if (result.includes("Player Wins")) {
-      this.playerHand.push(this.createRandomCard());
-    } else if (result.includes("Player Loses")) {
-      this.opponentHand.push(this.createRandomCard());
-    } else {
-      this.playerHand.push(this.createRandomCard());
-      this.opponentHand.push(this.createRandomCard());
+        this.setupSocketListeners();
+        this.renderHands(); // Render initial waiting state
     }
 
-    // Remove played cards
-    this.playerHand.splice(playerIndex, 1);
-    this.opponentHand.splice(opponentIndex, 1);
+    setupSocketListeners() {
+        this.socket.on('waitingForOpponent', () => {
+            this.resultDiv.innerText = "Waiting for an opponent...";
+        });
 
-    this.renderHands();
+        this.socket.on('gameStart', (data) => {
+            this.gameId = data.gameId;
+            this.playerHand = data.hand;
+            this.isPlayerOne = data.isPlayerOne;
+            this.resultDiv.innerText = `Game started! You are ${this.isPlayerOne ? 'Player 1' : 'Player 2'}. Choose a card.`;
+            this.renderHands(data.opponentHandSize);
+        });
 
-    // Check for game over
-    if (this.playerHand.length === 0 || this.opponentHand.length === 0) {
-      this.resultDiv.innerText += " | Game Over!";
+        this.socket.on('opponentPlayed', () => {
+            this.resultDiv.innerText = "Opponent has played their card. Waiting for your move...";
+        });
+        
+        this.socket.on('turnResult', (data) => {
+            this.playerHand = data.yourHand;
+            this.hasPlayed = false; // Reset for next turn
+            
+            this.resultDiv.innerText = data.resultText;
+            this.renderHands(data.opponentHandSize);
+            
+            if (data.gameOver) {
+                let finalResult = "Game Over! ";
+                if (data.finalWinnerId === this.socket.id) {
+                    finalResult += "YOU WIN!";
+                } else if (data.finalWinnerId === 'Tie') {
+                    finalResult += "IT'S A TIE!";
+                } else {
+                    finalResult += "You lose.";
+                }
+                this.resultDiv.innerText = finalResult;
+                // Disable playing
+                this.playerHandDiv.querySelectorAll('.player-card').forEach(card => card.onclick = null);
+            }
+        });
+        
+        this.socket.on('opponentDisconnected', (message) => {
+            this.resultDiv.innerText = message;
+            // Disable playing
+            this.playerHandDiv.querySelectorAll('.player-card').forEach(card => card.onclick = null);
+        });
+        
+        this.socket.on('error', (message) => {
+            console.error(message);
+            this.resultDiv.innerText = `Error: ${message}`;
+            this.hasPlayed = false; // Allow another attempt
+            this.renderHands(this.opponentHandDiv.children.length);
+        });
     }
-  }
 
-  resolveBattle(playerCard, opponentCard) {
-    const p = playerCard.element;
-    const o = opponentCard.element;
+    renderHands(opponentHandSize = 0) {
+        this.playerHandDiv.innerHTML = "";
+        this.opponentHandDiv.innerHTML = "";
 
-    if (p === o) return "Tie!";
-    if (p === "Plasma") return "Player Wins!";
-    if (o === "Plasma") return "Player Loses!";
+        // Player Hand
+        this.playerHand.forEach((card, index) => {
+            const cardDiv = document.createElement("div");
+            cardDiv.className = "card player-card";
+            cardDiv.innerText = card.element;
+            
+            // Only allow clicking if you haven't played this turn
+            if (!this.hasPlayed) {
+                cardDiv.onclick = () => this.playCard(index);
+                cardDiv.title = "Click to play";
+            } else {
+                cardDiv.style.opacity = '0.5';
+                cardDiv.style.cursor = 'default';
+                cardDiv.title = "Waiting for opponent...";
+            }
+            
+            this.playerHandDiv.appendChild(cardDiv);
+        });
 
-    switch (p) {
-      case "Rock":
-        if (["Scissors", "Darkness", "Water"].includes(o)) return "Player Wins!";
-        return "Player Loses!";
-      case "Paper":
-        if (["Rock", "Darkness", "Magic"].includes(o)) return "Player Wins!";
-        return "Player Loses!";
-      case "Scissors":
-        if (["Paper", "Magic", "Lightning"].includes(o)) return "Player Wins!";
-        return "Player Loses!";
-      case "Darkness":
-        if (["Scissors", "Lightning", "Earth"].includes(o)) return "Player Wins!";
-        return "Player Loses!";
-      case "Magic":
-        if (["Darkness", "Earth", "Fire"].includes(o)) return "Player Wins!";
-        return "Player Loses!";
-      case "Lightning":
-        if (["Magic", "Fire", "Water"].includes(o)) return "Player Wins!";
-        return "Player Loses!";
-      case "Earth":
-        if (["Rock", "Paper", "Water"].includes(o)) return "Player Wins!";
-        return "Player Loses!";
-      case "Fire":
-        if (["Rock", "Paper", "Earth"].includes(o)) return "Player Wins!";
-        return "Player Loses!";
-      case "Water":
-        if (["Paper", "Scissors", "Darkness", "Lightning", "Fire"].includes(o)) return "Player Wins!";
-        return "Player Loses!";
+        // Opponent Hand (only show the count)
+        for (let i = 0; i < opponentHandSize; i++) {
+            const cardDiv = document.createElement("div");
+            cardDiv.className = "card opponent-card";
+            cardDiv.innerText = "?";
+            this.opponentHandDiv.appendChild(cardDiv);
+        }
+        
+        // Use the saved card size preference for styling
+        this.playerHandDiv.querySelectorAll('.card').forEach(card => {
+            card.style.width = '2.5in'; // Use your saved preference
+            card.style.height = '3.5in'; // Use your saved preference
+        });
+        this.opponentHandDiv.querySelectorAll('.card').forEach(card => {
+            card.style.width = '2.5in'; // Use your saved preference
+            card.style.height = '3.5in'; // Use your saved preference
+        });
     }
 
-    return "Tie!";
-  }
+    playCard(cardIndex) {
+        if (!this.gameId) {
+            this.resultDiv.innerText = "Game not started yet.";
+            return;
+        }
+        if (this.hasPlayed) {
+            this.resultDiv.innerText = "You have already played a card this turn. Waiting for opponent.";
+            return;
+        }
+
+        this.hasPlayed = true; // Mark as played locally
+        this.resultDiv.innerText = `You played ${this.playerHand[cardIndex].element}. Waiting for opponent...`;
+        this.renderHands(this.opponentHandDiv.children.length); // Rerender to disable clicks
+        
+        // Send the move to the server
+        this.socket.emit('playCard', { 
+            gameId: this.gameId, 
+            cardIndex: cardIndex 
+        });
+    }
 }
 
 // Initialize game
-const game = new Game();
+const game = new MultiplayerGame();
