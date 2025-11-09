@@ -1,138 +1,113 @@
-// game.js
-const socket = io(); // Connects to the server running on the same host/port
+const elements = ["Rock", "Paper", "Scissors", "Fire", "Water", "Earth", "Magic", "Lightning", "Darkness", "Plasma"];
+let playerHand = [];
+let opponentHand = [];
+let playerName = "";
+let leaderboard = JSON.parse(localStorage.getItem("leaderboard") || "[]");
 
-class MultiplayerGame {
-    constructor() {
-        this.socket = socket;
-        this.gameId = null;
-        this.playerHand = [];
-        this.isPlayerTurn = false;
-        this.hasPlayed = false;
+const playerHandDiv = document.getElementById("player-hand");
+const opponentHandDiv = document.getElementById("opponent-hand");
+const resultDiv = document.getElementById("result");
+const leaderboardDiv = document.getElementById("leaderboard");
+const gameArea = document.getElementById("game-area");
 
-        this.playerHandDiv = document.getElementById("player-hand");
-        this.opponentHandDiv = document.getElementById("opponent-hand");
-        this.resultDiv = document.getElementById("result");
+document.getElementById("start-game").onclick = () => {
+    const nameInput = document.getElementById("player-name");
+    if (!nameInput.value) return alert("Enter your name!");
+    playerName = nameInput.value;
+    document.getElementById("setup").style.display = "none";
+    gameArea.style.display = "block";
+    initHands();
+    renderHands();
+    renderLeaderboard();
+};
 
-        this.setupSocketListeners();
-        this.renderHands(); // Render initial waiting state
-    }
+document.getElementById("play-again").onclick = () => {
+    initHands();
+    renderHands();
+    resultDiv.innerText = "New game started!";
+};
 
-    setupSocketListeners() {
-        this.socket.on('waitingForOpponent', () => {
-            this.resultDiv.innerText = "Waiting for an opponent...";
-        });
+document.getElementById("download-csv").onclick = () => {
+    if (leaderboard.length === 0) return alert("No leaderboard data!");
+    let csv = "Name,Score\n";
+    leaderboard.forEach(p => csv += `${p.name},${p.score}\n`);
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "leaderboard.csv"; a.click();
+    URL.revokeObjectURL(url);
+};
 
-        this.socket.on('gameStart', (data) => {
-            this.gameId = data.gameId;
-            this.playerHand = data.hand;
-            this.isPlayerOne = data.isPlayerOne;
-            this.resultDiv.innerText = `Game started! You are ${this.isPlayerOne ? 'Player 1' : 'Player 2'}. Choose a card.`;
-            this.renderHands(data.opponentHandSize);
-        });
+function initHands() {
+    playerHand = Array.from({length:7}, () => randomCard());
+    opponentHand = Array.from({length:7}, () => randomCard());
+}
 
-        this.socket.on('opponentPlayed', () => {
-            this.resultDiv.innerText = "Opponent has played their card. Waiting for your move...";
-        });
-        
-        this.socket.on('turnResult', (data) => {
-            this.playerHand = data.yourHand;
-            this.hasPlayed = false; // Reset for next turn
-            
-            this.resultDiv.innerText = data.resultText;
-            this.renderHands(data.opponentHandSize);
-            
-            if (data.gameOver) {
-                let finalResult = "Game Over! ";
-                if (data.finalWinnerId === this.socket.id) {
-                    finalResult += "YOU WIN!";
-                } else if (data.finalWinnerId === 'Tie') {
-                    finalResult += "IT'S A TIE!";
-                } else {
-                    finalResult += "You lose.";
-                }
-                this.resultDiv.innerText = finalResult;
-                // Disable playing
-                this.playerHandDiv.querySelectorAll('.player-card').forEach(card => card.onclick = null);
-            }
-        });
-        
-        this.socket.on('opponentDisconnected', (message) => {
-            this.resultDiv.innerText = message;
-            // Disable playing
-            this.playerHandDiv.querySelectorAll('.player-card').forEach(card => card.onclick = null);
-        });
-        
-        this.socket.on('error', (message) => {
-            console.error(message);
-            this.resultDiv.innerText = `Error: ${message}`;
-            this.hasPlayed = false; // Allow another attempt
-            this.renderHands(this.opponentHandDiv.children.length);
-        });
-    }
+function randomCard() {
+    const index = Math.floor(Math.random() * elements.length);
+    return { element: elements[index], value: index+1 };
+}
 
-    renderHands(opponentHandSize = 0) {
-        this.playerHandDiv.innerHTML = "";
-        this.opponentHandDiv.innerHTML = "";
+function renderHands() {
+    playerHandDiv.innerHTML = "";
+    opponentHandDiv.innerHTML = "";
+    playerHand.forEach((card, idx) => {
+        const div = document.createElement("div");
+        div.className = "card player-card";
+        div.innerText = card.element;
+        div.onclick = () => playTurn(idx);
+        playerHandDiv.appendChild(div);
+    });
+    opponentHand.forEach(() => {
+        const div = document.createElement("div");
+        div.className = "card opponent-card";
+        div.innerText = "X";
+        opponentHandDiv.appendChild(div);
+    });
+}
 
-        // Player Hand
-        this.playerHand.forEach((card, index) => {
-            const cardDiv = document.createElement("div");
-            cardDiv.className = "card player-card";
-            cardDiv.innerText = card.element;
-            
-            // Only allow clicking if you haven't played this turn
-            if (!this.hasPlayed) {
-                cardDiv.onclick = () => this.playCard(index);
-                cardDiv.title = "Click to play";
-            } else {
-                cardDiv.style.opacity = '0.5';
-                cardDiv.style.cursor = 'default';
-                cardDiv.title = "Waiting for opponent...";
-            }
-            
-            this.playerHandDiv.appendChild(cardDiv);
-        });
+function playTurn(idx) {
+    const playerCard = playerHand[idx];
+    const opponentIdx = Math.floor(Math.random() * opponentHand.length);
+    const opponentCard = opponentHand[opponentIdx];
 
-        // Opponent Hand (only show the count)
-        for (let i = 0; i < opponentHandSize; i++) {
-            const cardDiv = document.createElement("div");
-            cardDiv.className = "card opponent-card";
-            cardDiv.innerText = "?";
-            this.opponentHandDiv.appendChild(cardDiv);
-        }
-        
-        // Use the saved card size preference for styling
-        this.playerHandDiv.querySelectorAll('.card').forEach(card => {
-            card.style.width = '2.5in'; // Use your saved preference
-            card.style.height = '3.5in'; // Use your saved preference
-        });
-        this.opponentHandDiv.querySelectorAll('.card').forEach(card => {
-            card.style.width = '2.5in'; // Use your saved preference
-            card.style.height = '3.5in'; // Use your saved preference
-        });
-    }
+    const result = resolveBattle(playerCard, opponentCard);
+    resultDiv.innerText = `Player: ${playerCard.element} vs Opponent: ${opponentCard.element} → ${result}`;
 
-    playCard(cardIndex) {
-        if (!this.gameId) {
-            this.resultDiv.innerText = "Game not started yet.";
-            return;
-        }
-        if (this.hasPlayed) {
-            this.resultDiv.innerText = "You have already played a card this turn. Waiting for opponent.";
-            return;
-        }
+    if (result.includes("Win")) playerHand.push(randomCard());
+    if (result.includes("Lose")) opponentHand.push(randomCard());
 
-        this.hasPlayed = true; // Mark as played locally
-        this.resultDiv.innerText = `You played ${this.playerHand[cardIndex].element}. Waiting for opponent...`;
-        this.renderHands(this.opponentHandDiv.children.length); // Rerender to disable clicks
-        
-        // Send the move to the server
-        this.socket.emit('playCard', { 
-            gameId: this.gameId, 
-            cardIndex: cardIndex 
-        });
+    playerHand.splice(idx,1);
+    opponentHand.splice(opponentIdx,1);
+
+    renderHands();
+
+    if (playerHand.length === 0 || opponentHand.length === 0) {
+        resultDiv.innerText += " | Game Over!";
+        const score = playerHand.length;
+        saveScore(playerName, score);
     }
 }
 
-// Initialize game
-const game = new MultiplayerGame();
+function resolveBattle(playerCard, opponentCard) {
+    if (playerCard.element === opponentCard.element) return "Tie!";
+    if (playerCard.element === "Plasma") return "Player Wins!";
+    if (opponentCard.element === "Plasma") return "Player Loses!";
+    return playerCard.value > opponentCard.value ? "Player Wins!" : "Player Loses!";
+}
+
+function saveScore(name, score) {
+    leaderboard.push({name, score});
+    leaderboard.sort((a,b) => b.score - a.score);
+    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+    renderLeaderboard();
+}
+
+function renderLeaderboard() {
+    leaderboardDiv.innerHTML = "";
+    leaderboard.forEach(p => {
+        const div = document.createElement("div");
+        div.innerText = `${p.name}: ${p.score}`;
+        leaderboardDiv.appendChild(div);
+    });
+}

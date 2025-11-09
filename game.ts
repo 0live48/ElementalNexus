@@ -69,6 +69,8 @@ class Game {
     private playTurn(playerIndex: number): void {
         if (this.playerHand.length === 0 || this.opponentHand.length === 0) return;
 
+        if (playerIndex < 0 || playerIndex >= this.playerHand.length) return;
+
         const playerCard = this.playerHand[playerIndex];
         const opponentIndex = Math.floor(Math.random() * this.opponentHand.length);
         const opponentCard = this.opponentHand[opponentIndex];
@@ -76,17 +78,17 @@ class Game {
         const result = this.resolveBattle(playerCard, opponentCard);
         this.resultDiv.innerText = `Player: ${playerCard.element} vs Opponent: ${opponentCard.element} → ${result}`;
 
-        // Draw logic
+        // Add a new card based on result
         if (result.includes("Player Wins")) {
             this.playerHand.push(this.createRandomCard());
         } else if (result.includes("Player Loses")) {
             this.opponentHand.push(this.createRandomCard());
-        } else { // Tie
+        } else {
             this.playerHand.push(this.createRandomCard());
             this.opponentHand.push(this.createRandomCard());
         }
 
-        // Remove played cards
+        // Remove played cards safely
         this.playerHand.splice(playerIndex, 1);
         this.opponentHand.splice(opponentIndex, 1);
 
@@ -106,37 +108,19 @@ class Game {
         if (p === "Plasma") return "Player Wins!";
         if (o === "Plasma") return "Player Loses!";
 
-        switch (p) {
-            case "Rock":
-                if (["Scissors", "Darkness", "Water"].includes(o)) return "Player Wins!";
-                return "Player Loses!";
-            case "Paper":
-                if (["Rock", "Darkness", "Magic"].includes(o)) return "Player Wins!";
-                return "Player Loses!";
-            case "Scissors":
-                if (["Paper", "Magic", "Lightning"].includes(o)) return "Player Wins!";
-                return "Player Loses!";
-            case "Darkness":
-                if (["Scissors", "Lightning", "Earth"].includes(o)) return "Player Wins!";
-                return "Player Loses!";
-            case "Magic":
-                if (["Darkness", "Earth", "Fire"].includes(o)) return "Player Wins!";
-                return "Player Loses!";
-            case "Lightning":
-                if (["Magic", "Fire", "Water"].includes(o)) return "Player Wins!";
-                return "Player Loses!";
-            case "Earth":
-                if (["Rock", "Paper", "Water"].includes(o)) return "Player Wins!";
-                return "Player Loses!";
-            case "Fire":
-                if (["Rock", "Paper", "Earth"].includes(o)) return "Player Wins!";
-                return "Player Loses!";
-            case "Water":
-                if (["Paper", "Scissors", "Darkness", "Lightning", "Fire"].includes(o)) return "Player Wins!";
-                return "Player Loses!";
-        }
+        const winsAgainst: { [key: string]: string[] } = {
+            "Rock": ["Scissors", "Darkness", "Water"],
+            "Paper": ["Rock", "Darkness", "Magic"],
+            "Scissors": ["Paper", "Magic", "Lightning"],
+            "Darkness": ["Scissors", "Lightning", "Earth"],
+            "Magic": ["Darkness", "Earth", "Fire"],
+            "Lightning": ["Magic", "Fire", "Water"],
+            "Earth": ["Rock", "Paper", "Water"],
+            "Fire": ["Rock", "Paper", "Earth"],
+            "Water": ["Paper", "Scissors", "Darkness", "Lightning", "Fire"]
+        };
 
-        return "Tie!";
+        return winsAgainst[p]?.includes(o) ? "Player Wins!" : "Player Loses!";
     }
 }
 

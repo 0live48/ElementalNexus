@@ -1,0 +1,6 @@
+@ElementalNexusAPI_HostAddress = http://localhost:5285
+
+GET {{ElementalNexusAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

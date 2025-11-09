@@ -1,0 +1,9 @@
+C:\ElementalNexus\ElementalNexusAPI\obj\Debug\net8.0\ElementalNexusAPI.csproj.AssemblyReference.cache
+C:\ElementalNexus\ElementalNexusAPI\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\ElementalNexus\ElementalNexusAPI\obj\Debug\net8.0\ElementalNexusAPI.GeneratedMSBuildEditorConfig.editorconfig
+C:\ElementalNexus\ElementalNexusAPI\obj\Debug\net8.0\ElementalNexusAPI.AssemblyInfoInputs.cache
+C:\ElementalNexus\ElementalNexusAPI\obj\Debug\net8.0\ElementalNexusAPI.AssemblyInfo.cs
+C:\ElementalNexus\ElementalNexusAPI\obj\Debug\net8.0\ElementalNexusAPI.csproj.CoreCompileInputs.cache
+C:\ElementalNexus\ElementalNexusAPI\obj\Debug\net8.0\ElementalNexusAPI.MvcApplicationPartsAssemblyInfo.cs
+C:\ElementalNexus\ElementalNexusAPI\obj\Debug\net8.0\ElementalNexusAPI.MvcApplicationPartsAssemblyInfo.cache
+C:\ElementalNexus\ElementalNexusAPI\obj\Debug\net8.0\ElementalNexusAPI.sourcelink.json
