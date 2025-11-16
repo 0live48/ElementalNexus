@@ -4,18 +4,32 @@ body {
     font-family: sans-serif;
     margin: 0;
     padding: 0;
-    text-align: center;
 }
 
-#game-area { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 20px; }
+#game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+}
 
-#opponent-hand, #player-hand { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+#opponent-hand, #player-hand {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
 
 .card {
-    width: 120px; height: 160px;
+    width: 100px;
+    height: 140px;
     border-radius: 8px;
-    display: flex; justify-content: center; align-items: center;
-    font-weight: bold; font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1rem;
     cursor: pointer;
     border: 3px solid #6c757d;
     box-shadow: 0 4px 8px rgba(0,0,0,0.4);
@@ -26,14 +40,34 @@ body {
 
 .player-card { background-color: #333; color: #fff; }
 .player-card:hover { transform: scale(1.05) translateY(-5px); background-color: #555; border-color: #4CAF50; }
-.player-card[style*="opacity:0.5"] { cursor: default !important; transform: none !important; }
 
 .opponent-card { background-color: #4a4e69; color: #eee; }
 
-#result { margin:10px 0; font-size:1.2rem; font-weight:bold; padding:10px 20px; border-radius:10px; background-color:#333; }
+#result { 
+    margin:10px 0; 
+    font-size:1.2rem; 
+    font-weight:bold; 
+    padding:10px 20px; 
+    border:3px solid #ffc107; 
+    border-radius:10px; 
+    text-align:center; 
+    min-width:250px; 
+    background-color:#333; 
+}
 
-#play-again { background-color:#dc3545; color:#fff; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; }
+#play-again { 
+    background-color:#dc3545; 
+    color:#fff; 
+    padding:10px 20px; 
+    font-weight:bold; 
+    border:none; 
+    border-radius:8px; 
+    cursor:pointer; 
+    margin-top:20px; 
+    font-size:1rem; 
+    transition:background-color 0.2s; 
+}
+
 #play-again:hover { background-color:#c82333; }
 
-#leaderboard { margin: 20px auto; text-align: center; }
-#leaderboard div { margin: 5px; }
+#leaderboard { margin: 20px; text-align:center; }

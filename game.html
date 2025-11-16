@@ -1,31 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elemental Nexus Game</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elemental Nexus</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="setup" style="text-align:center; margin-top:50px;">
+        <h1>Elemental Nexus</h1>
+        <input type="text" id="player-name" placeholder="Enter your name">
+        <button id="start-game">Start Game</button>
+    </div>
 
-<h1>Elemental Nexus Multiplayer (Single Player)</h1>
+    <div id="game-area" style="display:none; text-align:center; margin-top:20px;">
+        <div id="opponent-hand"></div>
+        <div id="player-hand"></div>
+        <div id="result"></div>
+        <button id="play-again">Play Again</button>
+        <h2>Leaderboard</h2>
+        <div id="leaderboard"></div>
+    </div>
 
-<div id="setup">
-  <label>Enter your name: <input type="text" id="player-name"></label>
-  <button id="start-game">Start Game</button>
-</div>
-
-<div id="game-area" style="display:none;">
-  <div id="opponent-hand"></div>
-  <div id="result">Game is ready!</div>
-  <div id="player-hand"></div>
-  <button id="play-again">Play Again</button>
-</div>
-
-<h2>Leaderboard</h2>
-<div id="leaderboard"></div>
-<button id="download-csv">Download Leaderboard CSV</button>
-
-<script src="game.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>

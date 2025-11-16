@@ -1,8 +1,9 @@
-const elements = ["Rock", "Paper", "Scissors", "Fire", "Water", "Earth", "Magic", "Lightning", "Darkness", "Plasma"];
+const elements = ["Rock","Paper","Scissors","Fire","Water","Earth","Magic","Lightning","Darkness","Plasma"];
 let playerHand = [];
 let opponentHand = [];
 let playerName = "";
-let leaderboard = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+// <-- YOUR NEW URL IS HERE
+const API_URL = "https://script.google.com/macros/s/AKfycbyJ6gI4TlrEBc_kF9CC-sjRF3GXOtcUo084uO8YtbXEpRe9DXlL0IwRmyejBZvTdke5ow/exec";
 
 const playerHandDiv = document.getElementById("player-hand");
 const opponentHandDiv = document.getElementById("opponent-hand");
@@ -18,24 +19,13 @@ document.getElementById("start-game").onclick = () => {
     gameArea.style.display = "block";
     initHands();
     renderHands();
-    renderLeaderboard();
+    loadLeaderboard();
 };
 
 document.getElementById("play-again").onclick = () => {
     initHands();
     renderHands();
     resultDiv.innerText = "New game started!";
-};
-
-document.getElementById("download-csv").onclick = () => {
-    if (leaderboard.length === 0) return alert("No leaderboard data!");
-    let csv = "Name,Score\n";
-    leaderboard.forEach(p => csv += `${p.name},${p.score}\n`);
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "leaderboard.csv"; a.click();
-    URL.revokeObjectURL(url);
 };
 
 function initHands() {
@@ -45,7 +35,7 @@ function initHands() {
 
 function randomCard() {
     const index = Math.floor(Math.random() * elements.length);
-    return { element: elements[index], value: index+1 };
+    return { element: elements[index], value: index + 1 };
 }
 
 function renderHands() {
@@ -77,8 +67,8 @@ function playTurn(idx) {
     if (result.includes("Win")) playerHand.push(randomCard());
     if (result.includes("Lose")) opponentHand.push(randomCard());
 
-    playerHand.splice(idx,1);
-    opponentHand.splice(opponentIdx,1);
+    playerHand.splice(idx, 1);
+    opponentHand.splice(opponentIdx, 1);
 
     renderHands();
 
@@ -96,18 +86,31 @@ function resolveBattle(playerCard, opponentCard) {
     return playerCard.value > opponentCard.value ? "Player Wins!" : "Player Loses!";
 }
 
-function saveScore(name, score) {
-    leaderboard.push({name, score});
-    leaderboard.sort((a,b) => b.score - a.score);
-    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
-    renderLeaderboard();
+async function saveScore(name, score) {
+    try {
+        const params = new URLSearchParams();
+        params.append("action", "add");
+        params.append("name", name);
+        params.append("score", score);
+
+        await fetch(`${API_URL}?${params.toString()}`);
+        loadLeaderboard();
+    } catch (error) {
+        console.error("Error saving score:", error);
+    }
 }
 
-function renderLeaderboard() {
-    leaderboardDiv.innerHTML = "";
-    leaderboard.forEach(p => {
-        const div = document.createElement("div");
-        div.innerText = `${p.name}: ${p.score}`;
-        leaderboardDiv.appendChild(div);
-    });
+async function loadLeaderboard() {
+    try {
+        const res = await fetch(`${API_URL}?action=get`);
+        const data = await res.json();
+        leaderboardDiv.innerHTML = "";
+        data.forEach(player => {
+            const div = document.createElement("div");
+            div.innerText = `${player.name}: ${player.score}`;
+            leaderboardDiv.appendChild(div);
+        });
+    } catch (error) {
+        console.error("Error loading leaderboard:", error);
+    }
 }
