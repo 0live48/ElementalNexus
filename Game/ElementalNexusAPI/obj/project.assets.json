@@ -487,11 +487,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\ElementalNexus\\Home Page\\Game\\ElementalNexusAPI\\ElementalNexusAPI.csproj",
+      "projectUniqueName": "C:\\ElementalNexus\\Game\\ElementalNexusAPI\\ElementalNexusAPI.csproj",
       "projectName": "ElementalNexusAPI",
-      "projectPath": "C:\\ElementalNexus\\Home Page\\Game\\ElementalNexusAPI\\ElementalNexusAPI.csproj",
+      "projectPath": "C:\\ElementalNexus\\Game\\ElementalNexusAPI\\ElementalNexusAPI.csproj",
       "packagesPath": "C:\\Users\\prash\\.nuget\\packages\\",
-      "outputPath": "C:\\ElementalNexus\\Home Page\\Game\\ElementalNexusAPI\\obj\\",
+      "outputPath": "C:\\ElementalNexus\\Game\\ElementalNexusAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\prash\\AppData\\Roaming\\NuGet\\NuGet.Config"

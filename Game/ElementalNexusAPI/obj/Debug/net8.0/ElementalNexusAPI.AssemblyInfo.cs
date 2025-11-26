@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ElementalNexusAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b1aa475fa229e0519c4b762d62f96e8cb84cc3ba")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eb76d45552f89e283fd9ed3c8ed3e0deb163ff3e")]
 [assembly: System.Reflection.AssemblyProductAttribute("ElementalNexusAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ElementalNexusAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

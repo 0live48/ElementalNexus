@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "STTcvzg6d3o=",
+  "dgSpecHash": "BZlcN0p5Hy8=",
   "success": true,
-  "projectFilePath": "C:\\ElementalNexus\\Home Page\\Game\\ElementalNexusAPI\\ElementalNexusAPI.csproj",
+  "projectFilePath": "C:\\ElementalNexus\\Game\\ElementalNexusAPI\\ElementalNexusAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\prash\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.11\\microsoft.aspnetcore.openapi.8.0.11.nupkg.sha512",
     "C:\\Users\\prash\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
