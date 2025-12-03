@@ -1,54 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Play | The Elemental Nexus</title>
-    <link rel="stylesheet" href="../style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cosmic Clash Game</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: #1a1a1a;
+        color: white;
+        overflow: hidden;
+    }
+
+    #game-wrapper {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #setup {
+        text-align: center;
+        margin-top: 50px;
+    }
+
+    #game-area {
+        width: 100%;
+        height: 100%;
+        display: none;
+        position: relative;
+    }
+
+    #center-battle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.5rem;
+        padding: 15px 25px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    #player-hand, #opponent-hand {
+        display: flex;
+        gap: 10px;
+        padding: 20px;
+    }
+
+    #player-hand {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    #opponent-hand {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .card {
+        background: #333;
+        border: 2px solid #555;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .player-card:hover {
+        background: #555;
+        transform: scale(1.1);
+    }
+</style>
 </head>
 <body>
+<div id="game-wrapper">
 
-    <nav>
-        <div class="logo">The Elemental Nexus</div>
-        <div class="nav-links">
-            <a href="../index.html">Home</a>
-            <a href="game.html" class="active">Game</a>
-            <a href="https://n0uysm-zr.goaffpro.com/" target="_blank">Affiliate Program</a>
-            <a href="../contact.html">Contact</a>
-        </div>
-    </nav>
-
-    <header class="hero">
-        <h1>Digital Arena</h1>
-        <p>Prepare to test your strategies in the Nexus simulation.</p>
-    </header>
-
-    <div class="container">
-        
-        <div class="story-preview" style="min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-            <h3>System Initializing...</h3>
-            <p>
-                We are currently building the browser-based battle engine. 
-                Soon, you will be able to load your deck and test mechanics right here.
-            </p>
-            <div class="coming-soon-badge">COMING SOON</div>
-        </div>
-
+    <div id="setup">
+        <h1>Cosmic Clash</h1>
+        <input id="player-name" placeholder="Enter your name" />
+        <button id="start-game">Start Game</button>
     </div>
 
-    <footer>
-        <p>&copy; 2025 The Elemental Nexus. All Rights Reserved.</p>
-        
-        <div class="newsletter-section">
-            <h2>Subscribe to our emails</h2>
-            <form action="mailto:support@theelementalnexus.com" method="post" enctype="text/plain" class="newsletter-form">
-                <div class="form-container">
-                    <input id="email-input" type="email" name="contact[email]" placeholder="Enter your email" required>
-                    <button type="submit" class="btn-submit" style="padding: 10px 20px;">Subscribe</button>
-                </div>
-            </form>
-        </div>
-    </footer>
+    <div id="game-area">
+        <div id="opponent-hand"></div>
+        <div id="center-battle">Clash Appears Here</div>
+        <div id="player-hand"></div>
+    </div>
+</div>
 
+<script>
+const elements = [
+    "Rock","Paper","Scissors","Darkness",
+    "Magic","Lightning","Earth","Fire","Water","Cosmic"
+];
+
+let playerHand = [];
+let opponentHand = [];
+let playerName = "";
+
+const playerDiv = document.getElementById("player-hand");
+const opponentDiv = document.getElementById("opponent-hand");
+const centerDiv = document.getElementById("center-battle");
+const gameArea = document.getElementById("game-area");
+
+// Battle Matrix
+const matrix = {
+    "Rock":     ["T","L","W","W","T","T","L","L","W"],
+    "Paper":    ["W","T","L","W","W","T","T","L","L"],
+    "Scissors": ["L","W","T","L","W","W","T","T","L"],
+    "Darkness": ["L","L","W","T","L","L","W","T","T"],
+    "Magic":    ["T","L","L","W","T","L","W","W","T"],
+    "Lightning":["T","T","L","L","W","T","L","W","W"],
+    "Earth":    ["W","T","T","L","L","W","T","L","W"],
+    "Fire":     ["W","W","T","T","L","L","W","T","L"],
+    "Water":    ["L","W","W","T","T","L","L","W","T"]
+};
+
+// Start Game
+
+document.getElementById("start-game").onclick = () => {
+    const nameInput = document.getElementById("player-name");
+    if (!nameInput.value) return alert("Enter your name!");
+
+    playerName = nameInput.value;
+    document.getElementById("setup").style.display = "none";
+    gameArea.style.display = "block";
+
+    initHands();
+    renderHands();
+};
+
+function initHands() {
+    playerHand = Array.from({length:7}, randomCard);
+    opponentHand = Array.from({length:7}, randomCard);
+}
+
+function randomCard() {
+    const i = Math.floor(Math.random() * elements.length);
+    return { element: elements[i] };
+}
+
+function renderHands() {
+    playerDiv.innerHTML = "";
+    opponentDiv.innerHTML = "";
+
+    playerHand.forEach((card, i) => {
+        const div = document.createElement("div");
+        div.className = "card player-card";
+        div.innerText = card.element;
+        div.onclick = () => playTurn(i);
+        playerDiv.appendChild(div);
+    });
+
+    opponentHand.forEach(() => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerText = "?";
+        opponentDiv.appendChild(div);
+    });
+}
+
+// Resolve rules
+function resolveBattle(p, o) {
+    if (p === "Cosmic" && o === "Cosmic") return "Tie";
+    if (p === "Cosmic") return "Win";
+    if (o === "Cosmic") return "Lose";
+
+    const row = matrix[p];
+    const col = elements.indexOf(o);
+
+    const r = row[col];
+    if (r === "W") return "Win";
+    if (r === "L") return "Lose";
+    return "Tie";
+}
+
+function playTurn(i) {
+    const pCard = playerHand[i];
+    const oppIndex = Math.floor(Math.random() * opponentHand.length);
+    const oCard = opponentHand[oppIndex];
+
+    const result = resolveBattle(pCard.element, oCard.element);
+
+    centerDiv.innerText = `${pCard.element} vs ${oCard.element} → ${result}`;
+
+    if (result === "Win" || result === "Tie") playerHand.push(randomCard());
+    if (result === "Lose") opponentHand.push(randomCard());
+
+    playerHand.splice(i, 1);
+    opponentHand.splice(oppIndex, 1);
+
+    renderHands();
+
+    if (playerHand.length === 0) centerDiv.innerText += " | You Lost!";
+    if (opponentHand.length === 0) centerDiv.innerText += " | You Won!";
+}
+</script>
 </body>
 </html>

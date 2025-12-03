@@ -1,116 +1,149 @@
-const elements = ["Rock","Paper","Scissors","Fire","Water","Earth","Magic","Lightning","Darkness","Plasma"];
-let playerHand = [];
-let opponentHand = [];
-let playerName = "";
-// <-- YOUR NEW URL IS HERE
-const API_URL = "https://script.google.com/macros/s/AKfycbyJ6gI4TlrEBc_kF9CC-sjRF3GXOtcUo084uO8YtbXEpRe9DXlL0IwRmyejBZvTdke5ow/exec";
+// game.js - The Mechanics
 
-const playerHandDiv = document.getElementById("player-hand");
-const opponentHandDiv = document.getElementById("opponent-hand");
-const resultDiv = document.getElementById("result");
-const leaderboardDiv = document.getElementById("leaderboard");
-const gameArea = document.getElementById("game-area");
+const GameEngine = {
+    playerDeck: [],
+    opponentDeck: [],
+    playerHand: [],
+    opponentHand: [],
 
-document.getElementById("start-game").onclick = () => {
-    const nameInput = document.getElementById("player-name");
-    if (!nameInput.value) return alert("Enter your name!");
-    playerName = nameInput.value;
-    document.getElementById("setup").style.display = "none";
-    gameArea.style.display = "block";
-    initHands();
-    renderHands();
-    loadLeaderboard();
-};
+    // The 9 Elements (Cosmic Removed)
+    elementsList: ["Rock", "Paper", "Scissors", "Darkness", "Magic", "Lightning", "Earth", "Fire", "Water"],
 
-document.getElementById("play-again").onclick = () => {
-    initHands();
-    renderHands();
-    resultDiv.innerText = "New game started!";
-};
+    // BATTLE MATRIX (9x9 Grid)
+    // Removed the 10th column (Cosmic interactions) from every row
+    // Removed the "Cosmic" row entirely
+    matrix: {
+        "Rock":      ["T", "L", "W", "W", "T", "T", "L", "L", "W"], 
+        "Paper":     ["W", "T", "L", "W", "W", "T", "T", "L", "L"], 
+        "Scissors":  ["L", "W", "T", "L", "W", "W", "T", "T", "L"], 
+        "Darkness":  ["L", "L", "W", "T", "L", "L", "W", "T", "T"], 
+        "Magic":     ["T", "L", "L", "W", "T", "L", "W", "W", "T"], 
+        "Lightning": ["T", "T", "L", "L", "W", "T", "L", "W", "W"], 
+        "Earth":     ["W", "T", "T", "L", "L", "W", "T", "L", "W"], 
+        "Fire":      ["W", "W", "T", "T", "L", "L", "W", "T", "L"], 
+        "Water":     ["L", "W", "W", "T", "T", "L", "L", "W", "T"] 
+    },
 
-function initHands() {
-    playerHand = Array.from({length:7}, () => randomCard());
-    opponentHand = Array.from({length:7}, () => randomCard());
-}
+    // Initialize a Battle
+    startBattle: function(pDeck, oDeck) {
+        this.playerDeck = [...pDeck]; 
+        this.opponentDeck = [...oDeck]; 
+        this.playerHand = [];
+        this.opponentHand = [];
+        
+        // Shuffle Decks
+        this.shuffle(this.playerDeck);
+        this.shuffle(this.opponentDeck);
 
-function randomCard() {
-    const index = Math.floor(Math.random() * elements.length);
-    return { element: elements[index], value: index + 1 };
-}
+        // Draw initial 5 cards (Survival Mode)
+        for(let i=0; i<5; i++) {
+            this.drawCard('player');
+            this.drawCard('opponent');
+        }
 
-function renderHands() {
-    playerHandDiv.innerHTML = "";
-    opponentHandDiv.innerHTML = "";
-    playerHand.forEach((card, idx) => {
-        const div = document.createElement("div");
-        div.className = "card player-card";
-        div.innerText = card.element;
-        div.onclick = () => playTurn(idx);
-        playerHandDiv.appendChild(div);
-    });
-    opponentHand.forEach(() => {
-        const div = document.createElement("div");
-        div.className = "card opponent-card";
-        div.innerText = "X";
-        opponentHandDiv.appendChild(div);
-    });
-}
+        this.render();
+        this.updateHUD();
+    },
 
-function playTurn(idx) {
-    const playerCard = playerHand[idx];
-    const opponentIdx = Math.floor(Math.random() * opponentHand.length);
-    const opponentCard = opponentHand[opponentIdx];
+    shuffle: function(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    },
 
-    const result = resolveBattle(playerCard, opponentCard);
-    resultDiv.innerText = `Player: ${playerCard.element} vs Opponent: ${opponentCard.element} → ${result}`;
+    drawCard: function(who) {
+        if(who === 'player' && this.playerDeck.length > 0) {
+            this.playerHand.push(this.playerDeck.pop());
+        } else if(who === 'opponent' && this.opponentDeck.length > 0) {
+            this.opponentHand.push(this.opponentDeck.pop());
+        }
+    },
 
-    if (result.includes("Win")) playerHand.push(randomCard());
-    if (result.includes("Lose")) opponentHand.push(randomCard());
+    resolveBattle: function(pCard, oCard) {
+        const row = this.matrix[pCard];
+        const colIndex = this.elementsList.indexOf(oCard);
 
-    playerHand.splice(idx, 1);
-    opponentHand.splice(opponentIdx, 1);
+        if (!row || colIndex === -1) {
+            console.error("Invalid card interaction:", pCard, oCard);
+            return "Tie";
+        }
 
-    renderHands();
+        const resultKey = row[colIndex];
 
-    if (playerHand.length === 0 || opponentHand.length === 0) {
-        resultDiv.innerText += " | Game Over!";
-        const score = playerHand.length;
-        saveScore(playerName, score);
-    }
-}
+        if (resultKey === "W") return "Win";
+        if (resultKey === "L") return "Lose";
+        return "Tie";
+    },
 
-function resolveBattle(playerCard, opponentCard) {
-    if (playerCard.element === opponentCard.element) return "Tie!";
-    if (playerCard.element === "Plasma") return "Player Wins!";
-    if (opponentCard.element === "Plasma") return "Player Loses!";
-    return playerCard.value > opponentCard.value ? "Player Wins!" : "Player Loses!";
-}
+    playTurn: function(handIndex) {
+        if(this.playerHand.length === 0 || this.opponentHand.length === 0) return;
 
-async function saveScore(name, score) {
-    try {
-        const params = new URLSearchParams();
-        params.append("action", "add");
-        params.append("name", name);
-        params.append("score", score);
+        // 1. Get Cards
+        const pCard = this.playerHand[handIndex];
+        const oppIndex = Math.floor(Math.random() * this.opponentHand.length);
+        const oCard = this.opponentHand[oppIndex];
 
-        await fetch(`${API_URL}?${params.toString()}`);
-        loadLeaderboard();
-    } catch (error) {
-        console.error("Error saving score:", error);
-    }
-}
+        // 2. Resolve Result
+        let result = this.resolveBattle(pCard, oCard);
+        
+        // 3. Update Visuals
+        document.getElementById("center-battle").innerText = `${pCard} vs ${oCard} -> ${result}`;
 
-async function loadLeaderboard() {
-    try {
-        const res = await fetch(`${API_URL}?action=get`);
-        const data = await res.json();
-        leaderboardDiv.innerHTML = "";
-        data.forEach(player => {
-            const div = document.createElement("div");
-            div.innerText = `${player.name}: ${player.score}`;
-            leaderboardDiv.appendChild(div);
+        // 4. DESTROY CARDS
+        this.playerHand.splice(handIndex, 1);
+        this.opponentHand.splice(oppIndex, 1);
+
+        // 5. SURVIVAL RULES
+        if (result === "Win") {
+            this.drawCard('player'); 
+        } 
+        else if (result === "Lose") {
+            this.drawCard('opponent');
+        } 
+        else {
+            this.drawCard('player');
+            this.drawCard('opponent');
+        }
+
+        this.render();
+        this.updateHUD();
+
+        // 6. GAME OVER CHECK
+        setTimeout(() => {
+            if(this.playerHand.length === 0) {
+                StoryModule.battleOver("Lose");
+            } else if(this.opponentHand.length === 0) {
+                StoryModule.battleOver("Win");
+            }
+        }, 200);
+    },
+
+    render: function() {
+        const pDiv = document.getElementById("player-hand");
+        const oDiv = document.getElementById("opponent-hand");
+        
+        pDiv.innerHTML = "";
+        oDiv.innerHTML = "";
+
+        this.playerHand.forEach((card, i) => {
+            let el = document.createElement("div");
+            el.className = "card player-card";
+            el.innerText = card;
+            el.onclick = () => this.playTurn(i);
+            pDiv.appendChild(el);
         });
-    } catch (error) {
-        console.error("Error loading leaderboard:", error);
+
+        this.opponentHand.forEach(() => {
+            let el = document.createElement("div");
+            el.className = "card";
+            el.innerText = "?";
+            oDiv.appendChild(el);
+        });
+    },
+
+    updateHUD: function() {
+        document.getElementById("player-deck-count").innerText = this.playerDeck.length;
+        document.getElementById("opp-deck-count").innerText = this.opponentDeck.length;
     }
-}
+};

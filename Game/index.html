@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>The Elemental Nexus - Story Mode</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="story-overlay">
+        <div id="story-content">
+            <h1 id="story-title">The Elemental Nexus</h1>
+            <p id="story-text">Welcome, Initiate. I am the Grand Archivist. Before you enter the Nexus, you must attune to an element.</p>
+            
+            <div id="choice-container">
+                <button class="choice-btn" onclick="StoryModule.chooseElement('Rock')">Rock (Strength)</button>
+                <button class="choice-btn" onclick="StoryModule.chooseElement('Paper')">Paper (Intellect)</button>
+                <button class="choice-btn" onclick="StoryModule.chooseElement('Scissors')">Scissors (Precision)</button>
+            </div>
+
+            <button id="continue-btn" style="display:none;" onclick="StoryModule.nextLevel()">Enter Battle</button>
+        </div>
+    </div>
+
+    <div id="game-wrapper">
+        <div class="top-hud">
+            <div>Opponent Deck: <span id="opp-deck-count">30</span></div>
+            <div>Level: <span id="level-indicator">1</span></div>
+        </div>
+
+        <div id="game-area">
+            <div id="opponent-hand"></div>
+            <div id="center-battle"></div>
+            <div id="player-hand"></div>
+        </div>
+        
+        <div class="bottom-hud">
+            Deck: <span id="player-deck-count">30</span>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+    <script src="story.js"></script>
+</body>
+</html>
