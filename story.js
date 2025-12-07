@@ -146,6 +146,6 @@ const StoryModule = {
     updateBackground: function() {
         const wrapper = document.getElementById("game-wrapper");
         // Points to your local file
-        wrapper.style.backgroundImage = "url('images/deck.gif')";
+        wrapper.style.backgroundImage = "url('images/DECK.gif')";
     }
 };
