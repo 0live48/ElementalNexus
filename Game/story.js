@@ -1,22 +1,31 @@
-// story.js - Handles Level Progression and Deck Building
+// story.js - Handles Level Progression, Deck Building, and Backgrounds
 
 const StoryModule = {
     currentLevel: 0,
     playerElement: "",
     
-    // --- 1. DECK FACTORY (Strict 30 Card Limit) ---
+    // --- 1. DECK FACTORY (Your Groupings) ---
     generateDeck: function(mainElement) {
         let deck = [];
         const addBatch = (elementName) => { for(let i = 0; i < 10; i++) deck.push(elementName); };
 
         if (mainElement === "Rock") {
-            addBatch("Rock"); addBatch("Earth"); addBatch("Magic");
+            // ROCK DECK: Rock, Water, Magic
+            addBatch("Rock"); 
+            addBatch("Water"); 
+            addBatch("Magic");
         } 
         else if (mainElement === "Paper") {
-            addBatch("Paper"); addBatch("Water"); addBatch("Darkness");
+            // PAPER DECK: Paper, Earth, Lightning
+            addBatch("Paper"); 
+            addBatch("Earth"); 
+            addBatch("Lightning");
         } 
         else if (mainElement === "Scissors") {
-            addBatch("Scissors"); addBatch("Fire"); addBatch("Lightning");
+            // SCISSORS DECK: Scissors, Fire, Darkness
+            addBatch("Scissors"); 
+            addBatch("Fire"); 
+            addBatch("Darkness");
         }
         
         return deck;
@@ -36,14 +45,17 @@ const StoryModule = {
         const title = document.getElementById("story-title");
         const btn = document.getElementById("continue-btn");
 
+        // --- NEW: APPLY BACKGROUND GIF TO ALL LEVELS ---
+        this.updateBackground();
+
         // Determine specific deck list string based on selection
         let deckList = "";
         if (this.playerElement === "Rock") {
-            deckList = "- 10 Rock\n- 10 Earth\n- 10 Magic";
+            deckList = "- 10 Rock\n- 10 Water\n- 10 Magic";
         } else if (this.playerElement === "Paper") {
-            deckList = "- 10 Paper\n- 10 Water\n- 10 Darkness";
+            deckList = "- 10 Paper\n- 10 Earth\n- 10 Lightning";
         } else if (this.playerElement === "Scissors") {
-            deckList = "- 10 Scissors\n- 10 Fire\n- 10 Lightning";
+            deckList = "- 10 Scissors\n- 10 Fire\n- 10 Darkness";
         }
 
         if (this.currentLevel === 1) {
@@ -128,5 +140,12 @@ const StoryModule = {
         if(e === "Rock") return "Paper";
         if(e === "Paper") return "Scissors";
         if(e === "Scissors") return "Rock";
+    },
+
+    // --- NEW: FORCES THE BACKGROUND GIF ---
+    updateBackground: function() {
+        const wrapper = document.getElementById("game-wrapper");
+        // Points to your local file
+        wrapper.style.backgroundImage = "url('images/deck.gif')";
     }
 };

@@ -1,41 +1,196 @@
-/* --- EXISTING STYLES (Keep card styles from before) --- */
-body { margin: 0; padding: 0; background: #1a1a1a; color: white; font-family: 'Courier New', monospace; overflow: hidden; }
-#game-wrapper { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
-#game-area { width: 100%; height: 70%; position: relative; display: flex; flex-direction: column; justify-content: center; }
-#player-hand, #opponent-hand { display: flex; justify-content: center; gap: 10px; padding: 10px; height: 20%; }
-#center-battle { height: 20%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; text-align: center; }
-.card { width: 80px; height: 120px; background: #333; border: 2px solid #555; border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; font-size: 0.9rem; }
-.player-card:hover { transform: translateY(-20px); background: #444; border-color: gold; }
-
-/* --- NEW STORY UI STYLES --- */
-#story-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.95); /* Dark screen covering game */
-    display: flex; justify-content: center; align-items: center;
-    z-index: 100;
+/* --- GLOBAL RESET --- */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1a1a1a;
+    color: white;
+    overflow: hidden;
+    user-select: none;
 }
 
-#story-content {
-    width: 60%;
+/* --- LAYOUT WRAPPERS --- */
+#game-wrapper {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    /* Placeholder GIF - Replace with your own */
+    background: url('https://media.giphy.com/media/U3qYN8S0j3bpK/giphy.gif') no-repeat center center fixed; 
+    background-size: cover; 
+    box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.7); 
+    transition: background-image 1s ease-in-out;
+}
+
+/* --- HUD --- */
+.top-hud, .bottom-hud {
+    width: 100%;
+    padding: 15px 20px;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.3rem; /* Slightly larger font for HUD */
+    font-weight: bold;
+    box-sizing: border-box;
+    border-bottom: 1px solid #444;
+}
+.bottom-hud { border-top: 1px solid #444; border-bottom: none; }
+
+/* --- CARD HANDS --- */
+#player-hand, #opponent-hand {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Increased gap between cards */
+    padding: 10px;
+    height: 200px; /* Increased container height for bigger cards */
+    align-items: center;
+}
+
+/* --- THE CARDS IN HAND (BIGGER NOW) --- */
+.card {
+    width: 110px;  /* Increased Width */
+    height: 160px; /* Increased Height */
+    background: #2b2b2b;
+    border: 3px solid #555; /* Thicker Border */
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.1rem; /* Larger Font */
     text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.4);
+    position: relative;
+    color: #ddd;
+}
+
+.player-card:hover {
+    transform: translateY(-25px) scale(1.15); /* Larger hover effect */
+    z-index: 10;
+    border-color: gold;
+    background: #333;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    color: #fff;
+}
+
+/* --- BATTLE STAGE (Center Zone) --- */
+#battle-stage {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.clash-container {
+    display: flex;
+    align-items: center;
+    gap: 50px; /* Increased gap */
+}
+
+/* SIMPLIFIED CLASH SLOTS (BIGGER NOW) */
+.clash-card {
+    width: 140px;  /* Increased Width */
+    height: 210px; /* Increased Height */
+    background: #111;
+    border: 4px solid #444; /* Thicker Border */
+    border-radius: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.4rem; /* Larger Font */
+    font-weight: bold;
+    color: transparent; 
+    box-shadow: inset 0 0 25px rgba(0,0,0,0.8);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+/* REVEAL STATE */
+.card-revealed {
+    background: #eee;
+    color: #000;
+    border-color: gold;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+}
+
+#vs-text {
+    font-size: 4rem; /* Larger VS text */
+    font-weight: 900;
+    color: #ff4444;
+    text-shadow: 0 0 25px red;
+    font-family: 'Courier New', monospace;
+}
+
+#result-message {
+    margin-top: 25px;
+    font-size: 2.5rem; /* Larger Result text */
+    font-weight: bold;
+    height: 50px;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.8);
+}
+
+/* --- STORY OVERLAY --- */
+#story-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 100;
+    display: flex; justify-content: center; align-items: center;
+}
+#story-content {
+    background: #1a1a1a;
     border: 2px solid gold;
     padding: 40px;
-    background: #111;
-    border-radius: 10px;
+    text-align: center;
+    border-radius: 15px;
+    max-width: 700px; /* Wider story box */
+    box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
 }
-
-#story-title { color: gold; font-size: 2.5rem; margin-bottom: 20px; }
-#story-text { font-size: 1.2rem; line-height: 1.6; margin-bottom: 30px; }
+#story-text { font-size: 1.2rem; line-height: 1.6; } /* Larger story text */
 
 .choice-btn, #continue-btn {
-    padding: 15px 30px; margin: 10px; font-size: 1.2rem;
-    background: #333; color: white; border: 1px solid gold;
-    cursor: pointer; transition: 0.3s;
+    padding: 15px 30px; margin: 15px;
+    background: transparent; color: gold;
+    border: 1px solid gold; cursor: pointer;
+    font-size: 1.2rem; /* Larger buttons */
+    transition: 0.3s;
 }
-.choice-btn:hover, #continue-btn:hover { background: gold; color: black; }
+.choice-btn:hover, #continue-btn:hover {
+    background: gold; color: black;
+}
 
-/* --- HUD STYLES (Card Counters) --- */
-.top-hud, .bottom-hud {
-    width: 100%; padding: 10px; background: #222;
-    display: flex; justify-content: space-between; font-weight: bold;
+/* --- DISCARD BUTTON & MODAL --- */
+#discard-btn {
+    position: absolute; right: 25px; top: 50%;
+    transform: translateY(-50%);
+    background: #333; color: #fff;
+    border: 2px solid #777; padding: 15px 25px; /* Larger button */
+    cursor: pointer; border-radius: 8px;
+    font-size: 1.1rem;
 }
+#discard-btn:hover { background: #555; border-color: gold; }
+
+#discard-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); z-index: 200;
+    display: none; justify-content: center; align-items: center;
+}
+.modal-content {
+    background: #222; border: 3px solid gold;
+    padding: 40px; width: 70%; border-radius: 15px;
+    position: relative; color: white;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+.close-btn {
+    position: absolute; top: 15px; right: 25px;
+    font-size: 35px; cursor: pointer; color: #888;
+}
+.close-btn:hover { color: white; }
+
+.history-grid { display: flex; gap: 30px; margin-top: 30px; }
+.history-column { flex: 1; background: #111; padding: 20px; border-radius: 10px; border: 1px solid #333; }
+.history-column h3 { border-bottom: 2px solid #333; padding-bottom: 15px; margin-top: 0; color: gold; font-size: 1.5rem; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 1.2rem; }

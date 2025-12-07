@@ -31,16 +31,45 @@
 
         <div id="game-area">
             <div id="opponent-hand"></div>
-            <div id="center-battle"></div>
+            
+            <div id="battle-stage">
+                <div class="clash-container">
+                    <div id="opp-clash-slot" class="clash-card"></div>
+                    <div id="vs-text">VS</div>
+                    <div id="player-clash-slot" class="clash-card"></div>
+                </div>
+                <div id="result-message"></div>
+            </div>
+
             <div id="player-hand"></div>
         </div>
         
         <div class="bottom-hud">
             Deck: <span id="player-deck-count">30</span>
         </div>
+
+        <button id="discard-btn" onclick="GameEngine.showDiscard()">Discard Pile</button>
+
+        <div id="discard-modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close-btn" onclick="GameEngine.closeDiscard()">&times;</span>
+                <h2>Battle History</h2>
+                <div class="history-grid">
+                    <div class="history-column">
+                        <h3>Your Graveyard</h3>
+                        <div id="player-graveyard-list"></div>
+                    </div>
+                    <div class="history-column">
+                        <h3>Enemy Graveyard</h3>
+                        <div id="opp-graveyard-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="game.js"></script>
     <script src="story.js"></script>
+
 </body>
 </html>
