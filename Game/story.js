@@ -45,7 +45,7 @@ const StoryModule = {
         const title = document.getElementById("story-title");
         const btn = document.getElementById("continue-btn");
 
-        // --- NEW: APPLY BACKGROUND GIF TO ALL LEVELS ---
+        // --- BACKGROUND GIF TO ALL LEVELS ---
         this.updateBackground();
 
         // Determine specific deck list string based on selection
